@@ -17,13 +17,13 @@ const button = document.getElementById("button")
     var xAxis = d3.axisBottom(xScale);
     var yAxis = d3.axisLeft(yScale);
 
-    const svg = d3.select("body")
+    const svg = d3.select(".Phase-Diagram")
         .append("svg")
         .attr("width", width)
         .attr("height", height)
         .attr("id", "Phase_Diagram")
         .append("g")
-        .attr("transform","translate(100,100)")
+        .attr("transform", "translate(100,100)");
         
 
     svg.append("g")
@@ -152,6 +152,10 @@ const phases=[
 			]
 
   const colorScale = d3.scaleOrdinal(d3.schemeCategory10);
+const startColor = '#C0C0FF';
+const endColor = '#400080';
+const interpolatePurple = d3.interpolate(startColor, endColor);
+const colorScalePurple = d3.scaleOrdinal().range(d3.range(10).map(i => interpolatePurple(i / 9)));
 
   const diagram = svg.selectAll("polygon")
     .data(phases)
@@ -197,11 +201,39 @@ diagram.on("click", function onclick(event, d) {
 
         WPLP = ((CPRP - mouseX) / (CPRP - CPLP)) * 100;
         WPRP = ((mouseX - CPLP) / (CPRP - CPLP)) * 100;
+      if(mouseX<0.76 && mouseY<727){
+        WPLP2=((0.76-mouseX)/(0.76-CPLP))*100;
+        WPRP2=((mouseX-CPLP)/(0.76-CPLP))*100;
+      }
+      else if(mouseX>0.76 && mouseX<2.10 && mouseY<727){
+        WPLP2=((CPRP-mouseX)/(CPRP-0.76))*100;
+        WPRP2=((mouseX-0.76)/(CPRP-0.76))*100;
+      }
 
         outputDisplay.innerHTML = "<strong>Carbon% in " + d.leftPhase + ":</strong> " + CPLP.toFixed(3) +
             "<br><strong>Carbon% in " + d.rightPhase + ":</strong> " + CPRP.toFixed(3) +
             "<br><strong>Weight% of " + d.leftPhase + ":</strong> " + WPLP.toFixed(2) +
-            "<br><strong>Weight% of " + d.rightPhase + ":</strong> " + WPRP.toFixed(2);
+            "<br><strong>Weight% of " + d.rightPhase + ":</strong> " + WPRP.toFixed(2)
+
+
+      if(mouseX<0.76 && mouseY<727){
+        console.log("hii")
+      outputDisplay.innerHTML+="<br><strong>Weight% of Pro-Eutectiod Ferrite=</strong> "+WPLP2.toFixed(2)+"<br><strong>Weight% of Pearlite=</strong> "+WPRP2.toFixed(2)}
+        else if(mouseX>0.76 && mouseX <2.10 && mouseY<727){
+           outputDisplay.innerHTML+="<br><strong>Weight% of Pearlite=</strong> "+WPLP2.toFixed(2)+"<br><strong>Weight% of Pro-Eutectoid Cementite=</strong> "+WPRP2.toFixed(2)
+        }
+
+
+
+
+
+
+
+
+
+
+
+      
         svg.select(".line").remove();
         svg.append("line")
             .attr("class","line")
@@ -396,7 +428,17 @@ function indexSelect(vertx,verty,testx,testy){
 		if(currentIndex !==-1){
 		outputCal(xPos,yPos,currentIndex);
 		outputDisplay.innerHTML="<strong>Carbon% in "+phases[currentIndex].leftPhase+"=</strong> "+CPLP.toFixed(3)+"<br><strong>Carbon% in "+phases[currentIndex].rightPhase+"=</strong> "+CPRP.toFixed(3)
-									+ "<br><strong>Weight% of "+phases[currentIndex].leftPhase+"=</strong> "+WPLP.toFixed(2)+"<br><strong>Weight% of "+phases[currentIndex].rightPhase+"=</strong> "+WPRP.toFixed(2)}
+									+ "<br><strong>Weight% of "+phases[currentIndex].leftPhase+"=</strong> "+WPLP.toFixed(2)+"<br><strong>Weight% of "+phases[currentIndex].rightPhase+"=</strong> "+WPRP.toFixed(2)
+    
+    if(xPos<0.76 && yPos<727){
+      console.log("hii")
+    outputDisplay.innerHTML+="<br><strong>Weight% of Pro-Eutectiod Ferrite=</strong> "+WPLP2.toFixed(2)+"<br><strong>Weight% of Pearlite=</strong> "+WPRP2.toFixed(2)}
+      else if(xPos>0.76 && xPos <2.10 && yPos<727){
+         outputDisplay.innerHTML+="<br><strong>Weight% of Pearlite=</strong> "+WPLP2.toFixed(2)+"<br><strong>Weight% of Pro-Eutectoid Cementite=</strong> "+WPRP2.toFixed(2)
+      }
+    
+    
+    
 		 svg.select(".line").remove();
         svg.append("line")
             .attr("class","line")
@@ -424,7 +466,7 @@ function indexSelect(vertx,verty,testx,testy){
   }
 
 
-
+  }
 
 function outputCal(x,y, index) {
     var leftVertices = phases[index].leftVertices;
@@ -441,9 +483,21 @@ function outputCal(x,y, index) {
 	else{CPRP = (y - b2) / m2};
 	WPLP = ((CPRP-x)/(CPRP-CPLP))*100;
 	WPRP = ((x-CPLP)/(CPRP-CPLP))*100;
-	
-	}
 
+
+  var xPos=parseFloat(carbonInput.value)
+  var yPos=parseFloat(temperatureInput.value)
+
+  if(xPos<0.76 && yPos<727){
+    WPLP2=((0.76-x)/(0.76-CPLP))*100;
+    WPRP2=((x-CPLP)/(0.76-CPLP))*100;
+	}
+  else if(xPos>0.76 && xPos<2.10 && yPos<727){
+    WPLP2=((CPRP-x)/(CPRP-0.76))*100;
+    WPRP2=((x-0.76)/(CPRP-0.76))*100;
+  }
+    
+}
 
 
   button.addEventListener("click",onclick)
@@ -454,3 +508,4 @@ svg.append("text")
     .attr("font-size","30px")
     .style("text-anchor", "middle")
     .text("Carbon Percentage (%)");
+
